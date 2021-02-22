@@ -9,7 +9,7 @@ from rest_framework.status import HTTP_204_NO_CONTENT
 from jwt_auth.authentication import ServiceTokenAuthentication
 
 from events_library.event_bus import EventBus
-from events_library.permissions import ServiceTokenPermission
+from events_library.application.permissions import ServiceTokenPermission
 from events_library.application.serializers import EventSerializer
 
 
