@@ -5,7 +5,7 @@ from django.conf import settings
 from requests import Request, RequestException, Session
 from rest_framework.renderers import JSONRenderer
 
-from .domain.event_log import EventLog
+from .models.event_log import EventLog
 
 LOG_EVENTS_ON_SUCCESS = settings.LOG_EVENTS_ON_SUCCESS
 

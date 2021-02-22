@@ -3,7 +3,7 @@ import typing
 from django.conf import settings
 
 from .api import BaseApi
-from .domain.handler_log import HandlerLog
+from .models.handler_log import HandlerLog
 
 EVENTS_MAPPING = settings.EVENTS_MAPPING
 
