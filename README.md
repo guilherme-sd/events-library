@@ -121,13 +121,11 @@ Of course, you can broadcast in a row as many events as you'd like:
 
 These are some assumptions that were made while building the library:
 
-1.  There is a single instance of each service in the network
+1.  The service that emits an event knows nothing about which services are subscribed to that event
 
-2.  The service that emits an event knows nothing about which services are subscribed to that event
+2.  Whenever event A is emitted, the payload sent along that event always has the same structure
 
-3.  Whenever event A is emitted, the payload sent along that event always has the same structure
-
-5.  The library should know nothing about the payloads that are associated to each event type, so it will not raise any validations errors: **Is your responsability to provide the correct payload each time you emit an event**
+3.  The library should know nothing about the payloads that are associated to each event type, so it will not raise any validations errors: **Is your responsability to provide the correct payload each time you emit an event**
 
 All these considerations mean that the library expects that developers count with a **public API or document**, which contains all the information related to each kind of event, which should include:
 
