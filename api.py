@@ -34,8 +34,19 @@ class BaseApi:
             },
         )
 
+        retries = 0
+        max_retries = 1
         prepared_req = self.session.prepare_request(req)
 
-        resp = self.session.send(prepared_req)
-        if raise_exception:
-            resp.raise_for_status()
+        while (retries < max_retries):
+            try:
+                resp = self.session.send(prepared_req)
+                if raise_exception:
+                    resp.raise_for_status()
+
+                return retries, True
+
+            except RequestException:
+                retries += 1
+
+        return max_retries, False
