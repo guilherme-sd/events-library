@@ -5,7 +5,7 @@ from django.conf import settings
 from requests import Request, RequestException, Session
 from rest_framework.renderers import JSONRenderer
 
-from .models.event_log import EventLog
+from .domain.event_log import EventLog
 
 LOG_EVENTS_ON_SUCCESS = settings.LOG_EVENTS_ON_SUCCESS
 
@@ -13,13 +13,15 @@ LOG_EVENTS_ON_SUCCESS = settings.LOG_EVENTS_ON_SUCCESS
 class BaseApi:
     """Base class for serving different APIs."""
 
-    def __init__(self, domain: str = None) -> None:
+    def __init__(self, domain: str = None, max_retries: int = None) -> None:
         """Initialize requests session."""
         self.session = Session()
         self.session.headers.update({
             'Content-Type': 'application/json',
         })
+
         self.domain = domain or settings.DOMAIN_NAME
+        self.max_retries = max_retries or 1
 
     def send_request(
         self,
@@ -55,15 +57,15 @@ class BaseApi:
 
     def send_event_request(
         self,
-        service: str,
+        service_name: str,
         event_type: str,
         payload: typing.Dict,
     ):
-        """Sends event to the provided service. It also uses
+        """Sends event to the provided service_name. It also uses
         some retry logic inside of it, and logs the event in DB
 
         Arguments:
-            service: str
+            service_name: str
                 The name of the service who will receive the event
             event_type: str
                 The type of event being sent
@@ -71,11 +73,10 @@ class BaseApi:
                 The payload data sent along the event
         """
 
-        path = f'{service}/{settings.EVENTS_URL}/'
+        path = f'service/{service_name}/{settings.EVENTS_URL}/'
         retry_number = 0
-        max_retries = 1
 
-        while (retry_number < max_retries):
+        while (retry_number < self.max_retries):
             was_success = True
             error_message = ''
 
