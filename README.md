@@ -1,3 +1,4 @@
+
 # Events-Library
 
 This library aims to provide a common interface for sending and receiving events in our microservice architecture, abstracting all microservices from implementation details such as:
@@ -114,22 +115,23 @@ Of couse, in another app (in the same Service), you could subscribe to those sam
     	    subscribe_to('user-deleted', handle_user_deleted)
     	    subscribe_to('user-deleted', handler_user_updated)
 
-## Emiting Events
+## Emitting Events
 
 You only need to import the `emit` function from the library and call it using the appropiate `event_type` and `payload` arguments.
-import emit from events_library
 
+    import emit from events_library
+    
     def some_function(*args, **kwargs):
-        # Some custom code logic before emiting the event
+        # Some custom code logic before emitting the event
 
         emit('user_created', {
             'user_id': user.id,
             'email': user.email,
         })
 
-        # Some custom code logic after emiting the event
+        # Some custom code logic after emitting the event
 
-The library will handle any exception that might occur while emiting the event, so there's no need for `try/except` blocks everytime you use the `emit` function.
+The library will handle any exception that might occur while emitting the event, so there's no need for `try/except` blocks everytime you use the `emit` function.
 
 Of course, you can broadcast in a row as many events as you'd like:
 
@@ -144,12 +146,13 @@ Of course, you can broadcast in a row as many events as you'd like:
 
 These are some assumptions that were made while building the library:
 
-1.  There is a single instance of each service in the network
-2.  The service that emits an event knows nothing about which services are subscribed to that event
-3.  Whenever event A is emitted, the payload sent along that event always has the same structure
-4.  The library should know nothing about the payloads that are associated to each event type, so it will not raise any validations errors: **Is your responsability to provide the correct payload each time you emit an event**
+1.  The service that emits an event knows nothing about which services are subscribed to that event
 
-All these considerations mean that the library expects that developers count with a public API or document, which contains all the information related to each kind of event, which should include:
+2.  Whenever event A is emitted, the payload sent along that event always has the same structure
+
+3.  The library should know nothing about the payloads that are associated to each event type, so it will not raise any validations errors: **Is your responsability to provide the correct payload each time you emit an event**
+
+All these considerations mean that the library expects that developers count with a **public API or document**, which contains all the information related to each kind of event, which should include:
 
 - name of the event
 - structure of the payload sent along that event
@@ -163,9 +166,11 @@ Also, as a guideline, we think is better if an event is emitted from a single re
 Here we mention details about the current implementation of the library, which might be subject to changes in the near future: this section will be modified when that happens.
 
 **1- The services sends events directly to one another**
+
 This means that currently, there is not a third party service that acts as a proxy/intermediary for sending the event from service A to service B, and viceversa
 
 **2- The library uses HTTP as transfer protocol**
+
 This means that we keep a request/response mechanism, so please keep in mind that **the execution of the code that goes after a call to the `emit` function might be delayed because of network traffic, failures and retries**.
 
 **3- Subscribe depends on devops configuration**
@@ -198,14 +203,13 @@ We decided to go with this approach because it allows to implement the `emit`and
 
 ## Give us your Feedback
 
-We are still figuring out the best way to implement the library: so, if you have some thoughts about how to improve the library in any way, please share it on the dev channel
-in Slack.
+We are still figuring out the best way to implement the library: so, if you have some thoughts about how to improve the library in any way, please share it on the dev channel in Slack.
 
-Here are some ideas we considered while thinking about how to build the library: you're welcome to use them as a starting point for any suggestion you could provide.
+Here are some ideas that we considered while thinking about how to build the library: you're welcome to use them as a starting point for any suggestion you could provide.
 
-**1- Location of the config file**
+**1- Location of the configuration**
 
-Instead of having the configuration for subscriptions (mapping between event and target services) in the devops submodule settings file, we could export from the events_library a `declare_event` function that allows to edit this configuration: this means each service, in each of their apps, could do in the app.py file something like this:
+Instead of having the **configuration for events subscriptions** (mapping between event and target services) in the devops submodule settings file, we could export from the events_library a `declare_event` function that allows to edit this configuration: this means each service, in each of their apps, could do in the app.py file something like this:
 
     class MyAppConfig(AppConfig):
         name = 'my_app'
@@ -236,15 +240,24 @@ However, this approach has some drawbacks. For example:
 
 Ideally, **A** should never have to call an `unsubscribe_from` function, using **Y** as `event_type` argument: if **A** didn't call the `subscribe_to` function when it started running again (after deleting the `subscribe_to` call), then it is not subscribed to such event. That should be it.
 
-However, this wouldn't work with the implementation explained above, because the information about **A** being subscribed to **Y** would still live in both services **E** and **B**: it would required to reboot again those services, or add custom logic for allowing the _"unsubscription"_.
+However, this wouldn't work with the implementation explained above, because the information about **A** being subscribed to **Y** would still live in both services **E** and **B**: it would require to reboot again those services, or add custom logic for allowing the _"unsubscription phase"_.
 
 **- Hard to synchronize on common scenarios**
-If a third service **C**, who started running after **B**, subscribes to event **Y**, then service **B** would not know about that and it would never send the event to **C**.
-This would require to make the current flow a little more complex, by doing something like this when service **C** starts running:
 
-_"Hey service **E**! I, service **C**, want to subscribe to event **Y**, so please also inform that to the service which emits that event"_
+If a third service **C**, who started running after **B**, subscribes to event **Y**, then service **B** would not know about that and it would never send the event to **C**.
+
+This would require to make the current flow a little more complex, by doing something like this when service **C** starts running: _"Hey service **E**,  I want to subscribe to event **Y**, so please also inform that to the service which emits that event"_
 
 But what if service **E** was rebooted after a rebuild? Then the information about **C** being subscribed to event **Y** would be deleted, and if **B** was to be rebooted later, then it would no be notified about the existance of **C**.
+
+We also thought about storing this relation between events and subscribers at database level (in service **E**) , allowing easy customization using the admin panel (easy as adding/editing/removing an instance). However, we considered this as an overkill, given that none of this data would be needed once we use an actual event bus.
+
+**- Microservices are hard**
+
+We are already dealing with small issues/inconsistencies with our current microservice architecture, so why would we want to make the architecture more complex by adding this new microservice **E**? 
+
+It also seemed like we were heading the way of implementing our own **event bus**, which might be silly given that there are already options out there (Kafka, RabbitMQ, Amazon Event Bridge) that does this more that well.
+
 
 **3- Use Event classes**
 
@@ -260,6 +273,6 @@ But what if service **E** was rebooted after a rebuild? Then the information abo
     class CreateUserEvent(DeleteUserEvent):
         email = models.EmailField()
 
-Having something like that would allow to use classes instead of raw strings when emitting/subscribing events: this would help with validation, and also with the logging of errors in database (instead of storing the event's payload as a JSON field, we could store independent columns for each field in the payload).
+Having something like that would allow to use classes instead of raw strings when emitting/subscribing events: this would help with validation, and also with the logging of events in database (instead of storing the event's payload as a JSON field, we could store independent columns for each field in the payload, making easier the visualization).
 
 The bad thing about this approach is that the library would need to know before hand which are the different events that might be emitted, which goes against the principle of being event-agnostic.
