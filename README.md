@@ -13,6 +13,31 @@ This library aims to provide a common interface for sending and receiving events
 - Django
 - Django REST Framework
 
+## Configuration
+
+The devops submodule should add this configuration to make thinks work:
+
+1 - In the settings file, create the EVENTS_URL (string) and EVENTS_MAPPING (dict) variables:
+
+    import json
+
+    EVENTS_URL = os.getenv('EVENTS_URL', 'service-events')
+
+    DEFAULT_EVENTS_MAPPING = json.dumps({
+        'user-created': ['payments, 'orders'],
+    })
+    EVENTS_MAPPING = json.loads(os.getenv('EVENTS_MAPPING', DEFAULT_EVENTS_MAPPING))
+
+2 - In the url file, create a router and register the EventViewSet:
+
+    from django.conf import settings
+    from rest_framework.routers import DefaultRouter
+    from events_library.views import EventViewSet
+
+    EVENT_ROUTER = DefaultRouter()
+    EVENTS_URL = settings.EVENTS_URL
+    EVENT_ROUTER.register(EVENTS_URL, EventViewSet, basename=EVENTS_URL)
+
 ## Usage
 
 The library exposes for the clients two methods:
