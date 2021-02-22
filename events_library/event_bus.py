@@ -1,10 +1,11 @@
 
 import typing
 from django.conf import settings
+
 from .api import BaseApi
+from .domain.handler_log import HandlerLog
 
 EVENTS_MAPPING = settings.EVENTS_MAPPING
-EVENTS_URL = settings.EVENTS_URL
 
 
 class EventBus():
@@ -26,12 +27,23 @@ class EventBus():
     @classmethod
     def emit_locally(cls, event_type: str, payload: typing.Dict):
         """Calls, with the given payload as argument, each
-        event_handler that was attached to the given event_type"""
+        event_handler that was attached to the given event_type.
+        It creates a HandlerLog in case of Exception during the
+        execution of a handler funtion"""
         if event_type not in cls.event_subscribers:
             return  # No op
 
         for event_handler in cls.event_subscribers[event_type]:
-            event_handler(payload)
+            try:
+                event_handler(payload)
+
+            except Exception as error:
+                HandlerLog.objects.create(
+                    event_type=event_type,
+                    payload=payload,
+                    error_message=str(error),
+                    handler_name=str(event_handler),
+                )
 
     @classmethod
     def emit_abroad(cls, event_type: str, payload: typing.Dict):

@@ -41,7 +41,7 @@ class BaseApi:
             url=f'https://{self.domain}/{url}',
             data=JSONRenderer().render(data),
             headers={
-                'Token': settings.JWT_AUTH['SERVICE_SECRET_TOKEN']
+                'Token': settings.JWT_AUTH['SERVICE_SECRET_TOKEN'],
             },
         )
 
@@ -92,7 +92,7 @@ class BaseApi:
                     payload=payload,
                     retry_number=retry_number,
                     was_success=was_success,
-                    error_message=error_message
+                    error_message=error_message,
                 )
 
                 if was_success:
