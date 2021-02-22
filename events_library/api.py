@@ -7,6 +7,8 @@ from rest_framework.renderers import JSONRenderer
 
 from .domain.event_log import EventLog
 
+LOG_EVENTS_ON_SUCCESS = settings.LOG_EVENTS_ON_SUCCESS
+
 
 class BaseApi:
     """Base class for serving different APIs."""
@@ -86,14 +88,15 @@ class BaseApi:
                 error_message = str(error)
 
             finally:
-                EventLog.objects.create(
-                    target_service=service,
-                    event_type=event_type,
-                    payload=payload,
-                    retry_number=retry_number,
-                    was_success=was_success,
-                    error_message=error_message,
-                )
+                if LOG_EVENTS_ON_SUCCESS or not was_success:
+                    EventLog.objects.create(
+                        target_service=service,
+                        event_type=event_type,
+                        payload=payload,
+                        retry_number=retry_number,
+                        was_success=was_success,
+                        error_message=error_message,
+                    )
 
                 if was_success:
                     break
