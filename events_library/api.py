@@ -2,7 +2,7 @@
 import typing
 
 from django.conf import settings
-from requests import Request, RequestException, Session
+from requests import Request, RequestException, Session, HTTPError
 from rest_framework.renderers import JSONRenderer
 
 
@@ -21,7 +21,7 @@ class BaseApi:
         self,
         path: str,
         data: typing.Dict,
-        raise_exception: bool = False,
+        raise_exception: bool = True,
     ) -> typing.Tuple[int, bool]:
         """Send request function."""
 
@@ -46,7 +46,7 @@ class BaseApi:
 
                 return retries, True
 
-            except RequestException:
+            except (HTTPError, RequestException):
                 retries += 1
 
         return max_retries, False

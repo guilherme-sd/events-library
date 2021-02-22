@@ -19,5 +19,4 @@ class ServiceTokenPermission(BasePermission):
     def has_object_permission(
         self, request: Request, view: View, obj: typing.Any,
     ) -> bool:
-        # Object permissions is blocked since it's not used.
         return False  # pragma: no coverage

@@ -36,4 +36,4 @@ class EventBus():
 
         for service in EVENTS_MAPPING[event_type]:
             path = f'{service}/{EVENTS_URL}/'
-            api.send_request(path, payload, True)
+            api.send_request(path, payload)
