@@ -36,7 +36,6 @@ class BaseApi:
         )
 
         retries = 0
-        self.max_retries = 1
         prepared_req = self.session.prepare_request(req)
 
         while (retries < self.max_retries):
