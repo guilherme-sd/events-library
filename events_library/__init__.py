@@ -1,6 +1,8 @@
 import typing
 from typing import Callable, Union
+
 from .event_bus import EventBus
+from .application.views import EventViewSet  # noqa: F401
 
 
 def emit(event_type: str, payload: typing.Dict):
