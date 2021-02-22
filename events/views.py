@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework.status import HTTP_204_NO_CONTENT
 
-
 from jwt_auth.authentication import ServiceTokenAuthentication
 
 from .event_bus import EventBus
@@ -15,6 +14,7 @@ from .serializers import EventSerializer
 
 
 class EventViewSet(ViewSet):
+    """Viewset for handling handling emitted events"""
     authentication_classes = [ServiceTokenAuthentication]
     permission_classes = [ServiceTokenPermission]
 
