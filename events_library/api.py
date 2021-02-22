@@ -9,13 +9,14 @@ from rest_framework.renderers import JSONRenderer
 class BaseApi:
     """Base class for serving different APIs."""
 
-    def __init__(self, domain: str = None) -> None:
+    def __init__(self, domain: str = None, max_retries: int = None) -> None:
         """Initialize requests session."""
         self.session = Session()
         self.session.headers.update({
             'Content-Type': 'application/json',
         })
         self.domain = domain or settings.DOMAIN_NAME
+        self.max_retries = max_retries or 1
 
     def send_request(
         self,
@@ -35,10 +36,10 @@ class BaseApi:
         )
 
         retries = 0
-        max_retries = 1
+        self.max_retries = 1
         prepared_req = self.session.prepare_request(req)
 
-        while (retries < max_retries):
+        while (retries < self.max_retries):
             try:
                 resp = self.session.send(prepared_req)
                 if raise_exception:
@@ -49,4 +50,4 @@ class BaseApi:
             except (HTTPError, RequestException):
                 retries += 1
 
-        return max_retries, False
+        return self.max_retries, False

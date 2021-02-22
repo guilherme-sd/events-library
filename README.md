@@ -15,7 +15,7 @@ The devops submodule should add this configuration to make everything work:
 
     import json
 
-    EVENTS_URL = os.getenv('EVENTS_URL', 'service-events')
+    EVENTS_URL = os.getenv('EVENTS_URL', 'event')
 
     DEFAULT_EVENTS_MAPPING = json.dumps({
         'user-created': ['payments, 'orders'],

@@ -37,5 +37,5 @@ def subscribe_to(
     if isinstance(event_handler, list):
         for handler in event_handler:
             EventBus.subscribe(event_type, handler)
-        else:
-            EventBus.subscribe(event_type, event_handler)
+    else:
+        EventBus.subscribe(event_type, event_handler)
