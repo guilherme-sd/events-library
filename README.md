@@ -9,7 +9,7 @@ This library aims to provide a common interface for sending and receiving events
 
 ## Configuration
 
-The devops submodule should add this configuration to make thinks work:
+The devops submodule should add this configuration to make everything work:
 
 1 - In the settings file, create the EVENTS_URL (string) and EVENTS_MAPPING (dict) variables:
 
