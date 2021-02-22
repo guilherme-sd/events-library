@@ -35,13 +35,12 @@ class EventBus():
 
     @classmethod
     def emit_abroad(cls, event_type: str, payload: typing.Dict):
-        """Sends the event to the services that were set (in the devops
-        submodule settings) as 'subscribed' to the given event_type"""
+        """Sends the event to the services that
+        are subscribed to the given event_type"""
         if event_type not in EVENTS_MAPPING:
             return  # No op
 
         api = BaseApi()
 
-        for service in EVENTS_MAPPING[event_type]:
-            path = f'{service}/{EVENTS_URL}/'
-            api.send_request(path, payload)
+        for service_name in EVENTS_MAPPING[event_type]:
+            api.send_event_request(service_name, event_type, payload)
