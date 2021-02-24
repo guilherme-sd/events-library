@@ -5,7 +5,7 @@ from django.conf import settings
 from requests import Request, RequestException, Session
 from rest_framework.renderers import JSONRenderer
 
-from .domain.event_log import EventLog
+from .models.event_log import EventLog
 
 LOG_EVENTS_ON_SUCCESS = settings.LOG_EVENTS_ON_SUCCESS
 
@@ -91,7 +91,7 @@ class BaseApi:
             finally:
                 if LOG_EVENTS_ON_SUCCESS or not was_success:
                     EventLog.objects.create(
-                        target_service=service,
+                        target_service=service_name,
                         event_type=event_type,
                         payload=payload,
                         retry_number=retry_number,
