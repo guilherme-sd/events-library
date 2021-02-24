@@ -1,4 +1,3 @@
-
 # Events-Library
 
 This library aims to provide a common interface for sending and receiving events in our microservice architecture, abstracting all microservices from implementation details such as:
@@ -8,11 +7,30 @@ This library aims to provide a common interface for sending and receiving events
 - the transport layer (HTTP, TPC, etc.)
 - the event bus or message broker (Kakfa, RabbitMQ, Redis, etc.)
 
-## Requirements
+## Configuration
 
-- Python 3.7
-- Django
-- Django REST Framework
+The devops submodule should add this configuration to make everything work:
+
+1 - In the settings file, create the EVENTS_URL (string) and EVENTS_MAPPING (dict) variables:
+
+    import json
+
+    EVENTS_URL = os.getenv('EVENTS_URL', 'event')
+
+    DEFAULT_EVENTS_MAPPING = json.dumps({
+        'user-created': ['payments, 'orders'],
+    })
+    EVENTS_MAPPING = json.loads(os.getenv('EVENTS_MAPPING', DEFAULT_EVENTS_MAPPING))
+
+2 - In the url file, create a router and register the EventViewSet:
+
+    from django.conf import settings
+    from rest_framework.routers import DefaultRouter
+    from events_library.views import EventViewSet
+
+    EVENT_ROUTER = DefaultRouter()
+    EVENTS_URL = settings.EVENTS_URL
+    EVENT_ROUTER.register(EVENTS_URL, EventViewSet, basename=EVENTS_URL)
 
 ## Usage
 
@@ -95,7 +113,7 @@ Of couse, in another app (in the same Service), you could subscribe to those sam
 You only need to import the `emit` function from the library and call it using the appropiate `event_type` and `payload` arguments.
 
     import emit from events_library
-    
+
     def some_function(*args, **kwargs):
         # Some custom code logic before emitting the event
 
@@ -221,7 +239,7 @@ However, this wouldn't work with the implementation explained above, because the
 
 If a third service **C**, who started running after **B**, subscribes to event **Y**, then service **B** would not know about that and it would never send the event to **C**.
 
-This would require to make the current flow a little more complex, by doing something like this when service **C** starts running: _"Hey service **E**,  I want to subscribe to event **Y**, so please also inform that to the service which emits that event"_
+This would require to make the current flow a little more complex, by doing something like this when service **C** starts running: _"Hey service **E**, I want to subscribe to event **Y**, so please also inform that to the service which emits that event"_
 
 But what if service **E** was rebooted after a rebuild? Then the information about **C** being subscribed to event **Y** would be deleted, and if **B** was to be rebooted later, then it would no be notified about the existance of **C**.
 
@@ -229,10 +247,9 @@ We also thought about storing this relation between events and subscribers at da
 
 **- Microservices are hard**
 
-We are already dealing with small issues/inconsistencies with our current microservice architecture, so why would we want to make the architecture more complex by adding this new microservice **E**? 
+We are already dealing with small issues/inconsistencies with our current microservice architecture, so why would we want to make the architecture more complex by adding this new microservice **E**?
 
 It also seemed like we were heading the way of implementing our own **event bus**, which might be silly given that there are already options out there (Kafka, RabbitMQ, Amazon Event Bridge) that does this more that well.
-
 
 **3- Use Event classes**
 
