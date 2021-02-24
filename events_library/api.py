@@ -81,7 +81,7 @@ class BaseApi:
             error_message = ''
 
             try:
-                self.send_event_request(path, payload)
+                self.send_request(path, payload)
 
             except RequestException as error:
                 retry_number += 1
