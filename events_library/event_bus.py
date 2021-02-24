@@ -5,6 +5,7 @@ from django.conf import settings
 from .api import BaseApi
 from .models.handler_log import HandlerLog
 
+
 EVENTS_MAPPING = settings.EVENTS_MAPPING
 
 
@@ -18,7 +19,7 @@ class EventBus():
 
     # A mapping, where the key is an event_type,
     # and the value is a list of service's names
-    map_event_to_subscribers = {}
+    map_event_to_target_services = {}
 
     @classmethod
     def subscribe(cls, event_type: str, event_handler: typing.Callable):
@@ -56,20 +57,26 @@ class EventBus():
     def emit_abroad(cls, event_type: str, payload: typing.Dict):
         """Sends the event to the services that
         are subscribed to the given event_type"""
-        if event_type not in cls.map_event_to_subscribers:
+        if event_type not in cls.map_event_to_target_services:
             return  # No op
 
         api = BaseApi()
 
-        for service_name in cls.map_event_to_subscribers[event_type]:
-            api.send_event_request(service_name, event_type, payload)
+        for target_service in cls.map_event_to_target_services[event_type]:
+            api.send_event_request(target_service, event_type, payload)
 
     @classmethod
     def declare_event(
         cls,
         event_type: str,
-        subscribed_services: typing.List[str]
+        target_services: typing.List[str]
     ):
         """Registers the services that should receive
         the events with the given event_type"""
-        pass
+        current_targets = cls.map_event_to_target_services.get(event_type, [])
+
+        for service_name in target_services:
+            if service_name not in current_targets:
+                current_targets.append(service_name)
+
+        cls.map_event_to_target_services[event_type] = current_targets
