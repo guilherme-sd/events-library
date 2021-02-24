@@ -12,19 +12,19 @@ User table.
 
     payload:
        	uuid: uuid
-       		The id of the user in Account's Service
+		The id of the user in Account's Service
 
-		email: string
-			The email of the user. This field is unique
-			among users in Account's Service
+	email: string
+		The email of the user. This field is unique
+		among users in Account's Service
 
-		token: string
-			Used for generating a link for recovery
-			of lost credentials
+	token: string
+		Used for generating a link for recovery
+		of lost credentials
 
-		token_for_email: string
-			Used for generating a link for recovery
-			of lost credentials
+	token_for_email: string
+		Used for generating a link for recovery
+		of lost credentials
 
 ## Update an User in Accounts
 This event is emitted when an user is updated in the Account's Service: the only fields that can be updated for the user are the email and password, but password lives only in the Account's Service, so only the edition of the email field should propagate to other's services that keeps a replica of the User table
@@ -36,11 +36,11 @@ This event is emitted when an user is updated in the Account's Service: the only
     
     payload:
     	uuid: uuid
-    		The id of the user in Account's Service
-    
-	    email: string
-	    	The email of the user. This field is unique
-	    	among users in Account's Service
+		The id of the user in Account's Service
+
+    	email: string
+		The email of the user. This field is unique
+		among users in Account's Service
 
 # Delete an User in Accounts
 
@@ -53,7 +53,7 @@ This event is emitted when an user is deleted from the Account's Service. The de
     
     payload:
     	uuid: uuid
-    		The id of the user in Account's Service
+		The id of the user in Account's Service
 
 ## Payment of an Order
 
@@ -66,12 +66,12 @@ Short description about this event. What does it does? When should it be emmited
     
     payload:
     	order_id: uuid
-    		The id of the order in the Order's Service
+		The id of the order in the Order's Service
     	
-	    shipping_location: string
-		    The name of the country to which the 
-		    order is being sent. The values come
-		    from the django_countries package
+    	shipping_location: string
+    		The name of the country to which the 
+		order is being sent. The values come
+		from the django_countries package
 
 ## User Report Count
 Short description about this event. What does it does? When should it be emmited?
