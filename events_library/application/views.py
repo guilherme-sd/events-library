@@ -16,7 +16,7 @@ class EventViewSet(ViewSet):
     authentication_classes = [ServiceTokenAuthentication]
     permission_classes = [ServiceTokenPermission]
 
-    @action(detail=False, methods=['post'], url_path='/')
+    @action(detail=False, methods=['post'], url_path='event')
     def handle_event(self, request: Request):
         serializer = EventSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
