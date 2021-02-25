@@ -10,7 +10,7 @@ from .models.event_log import EventLog
 LOG_EVENTS_ON_SUCCESS = settings.LOG_EVENTS_ON_SUCCESS
 
 
-class BaseApi:
+class EventApi:
     """Base class for serving different APIs."""
 
     def __init__(self, domain: str = None, max_retries: int = None) -> None:
