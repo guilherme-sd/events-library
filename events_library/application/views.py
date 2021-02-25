@@ -8,9 +8,9 @@ from rest_framework.status import HTTP_204_NO_CONTENT
 
 from jwt_auth.authentication import ServiceTokenAuthentication
 
-from .event_bus import EventBus
-from .permissions import ServiceTokenPermission
-from .serializers import EventSerializer
+from events_library.event_bus import EventBus
+from events_library.application.permissions import ServiceTokenPermission
+from events_library.application.serializers import EventSerializer
 
 
 class EventViewSet(ViewSet):
