@@ -2,11 +2,8 @@
 import typing
 from django.conf import settings
 
-from .api import BaseApi
+from .api import EventApi
 from .models.handler_log import HandlerLog
-
-
-EVENTS_MAPPING = settings.EVENTS_MAPPING
 
 
 class EventBus():
@@ -60,7 +57,7 @@ class EventBus():
         if event_type not in cls.map_event_to_target_services:
             return  # No op
 
-        api = BaseApi()
+        api = EventApi()
 
         for target_service in cls.map_event_to_target_services[event_type]:
             api.send_event_request(target_service, event_type, payload)
