@@ -1,5 +1,3 @@
-
-
 from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -8,9 +6,9 @@ from rest_framework.status import HTTP_204_NO_CONTENT
 
 from jwt_auth.authentication import ServiceTokenAuthentication
 
-from events_library.event_bus import EventBus
 from events_library.application.permissions import ServiceTokenPermission
 from events_library.application.serializers import EventSerializer
+from events_library.core.event_bus import EventBus
 
 
 class EventViewSet(ViewSet):

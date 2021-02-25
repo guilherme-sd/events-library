@@ -1,9 +1,8 @@
 
 import typing
-from django.conf import settings
 
-from .api import EventApi
-from .models.handler_log import HandlerLog
+from events_library.core.event_api import EventApi
+from events_library.models.handler_log import HandlerLog
 
 
 class EventBus():
