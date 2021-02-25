@@ -1,9 +1,6 @@
 import typing
 from typing import Callable, Union
-
-from .constants import Service  # noqa: F401
-from .event_bus import EventBus
-from .application.views import EventViewSet  # noqa: F401
+from events_library.core.event_bus import EventBus
 
 
 def emit(event_type: str, payload: typing.Dict):
@@ -44,6 +41,17 @@ def subscribe_to(
         EventBus.subscribe(event_type, event_handler)
 
 
+class Service():
+    """A class that encapsulates the available services
+    as members of the class, to be used instead of raw string"""
+    ACCOUNTS = 'accounts'
+    ORDERS = 'orders'
+    PAYMENTS = 'payments'
+    PROFILES = 'profiles'
+    REPORTS = 'reports'
+    SELFDECODE = 'selfdecode'
+
+
 def declare_event(
     event_type: str,
     subscribed_services: typing.List[str],
@@ -76,7 +84,14 @@ def declare_event(
     as well) for getting those options and avoid errors
     """
     for service_name in subscribed_services:
-        if Service.not_a_service_option(service_name):
+        if service_name not in [
+            Service.ACCOUNTS,
+            Service.ORDERS,
+            Service.PAYMENTS,
+            Service.PROFILES,
+            Service.REPORTS,
+            Service.SELFDECODE,
+        ]:
             raise ValueError(
                 f'{service_name} is not allowed '
                 'as a member of subscribed_services'
