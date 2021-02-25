@@ -5,8 +5,8 @@ from django.contrib.postgres.fields import JSONField
 
 
 class EventLog(BaseModel):
-    target_service = models.CharField(editable=False)
-    event_type = models.CharField(blank=False)
+    target_service = models.CharField(max_length=20, editable=False)
+    event_type = models.CharField(max_length=60, blank=False)
     payload = JSONField(default=dict)
 
     retry_number = models.IntegerField(default=0)
