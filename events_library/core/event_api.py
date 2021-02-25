@@ -73,7 +73,7 @@ class EventApi:
                 The payload data sent along the event
         """
 
-        path = f'service/{service_name}/{settings.EVENTS_URL}/'
+        path = f'service/{service_name}/event/'
         retry_number = 0
 
         while (retry_number < self.max_retries):
