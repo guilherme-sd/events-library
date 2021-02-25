@@ -2,7 +2,7 @@
 import typing
 
 from events_library.core.event_api import EventApi
-from events_library.models.handler_log import HandlerLog
+from events_library.models import HandlerLog
 
 
 class EventBus():
