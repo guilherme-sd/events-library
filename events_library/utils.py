@@ -1,6 +1,10 @@
 import typing
+
+from django.db.models import Model
 from typing import Callable, Union
+
 from events_library.core.event_bus import EventBus
+from events_library.models import ObjectModel
 
 
 def emit(event_type: str, payload: typing.Dict):
@@ -41,6 +45,30 @@ def subscribe_to(
         EventBus.subscribe(event_type, event_handler)
 
 
+def subscribe_to_cud(
+    resource_name: str,
+    object_model_class: typing.Type[ObjectModel],
+):
+    """Subscribes to CUD changes, and reflects them
+    in the given object_model_class
+
+    Arguments:
+        resource_name: str
+            The name of the resource/model ('users', 'articles')
+
+        object_model_class: events_library.models.ObjectModel
+            This must be a class that simply inherits from the
+            ObjectModel class exported from the events_library
+    """
+    if not issubclass(object_model_class, ObjectModel):
+        raise ValueError(
+            f'{object_model_class} does not inherit from '
+            'the ObjectModel exported from the events_library'
+        )
+
+    EventBus.subscribe_to_cud(resource_name, object_model_class)
+
+
 class Service():
     """A class that encapsulates the available services
     as members of the class, to be used instead of raw string"""
@@ -50,6 +78,17 @@ class Service():
     PROFILES = 'profiles'
     REPORTS = 'reports'
     SELFDECODE = 'selfdecode'
+
+    @classmethod
+    def is_valid(service_name: str):
+        return service_name not in [
+            Service.ACCOUNTS,
+            Service.ORDERS,
+            Service.PAYMENTS,
+            Service.PROFILES,
+            Service.REPORTS,
+            Service.SELFDECODE,
+        ]
 
 
 def declare_event(
@@ -84,17 +123,55 @@ def declare_event(
     as well) for getting those options and avoid errors
     """
     for service_name in subscribed_services:
-        if service_name not in [
-            Service.ACCOUNTS,
-            Service.ORDERS,
-            Service.PAYMENTS,
-            Service.PROFILES,
-            Service.REPORTS,
-            Service.SELFDECODE,
-        ]:
+        if not Service.is_valid(service_name):
             raise ValueError(
                 f'{service_name} is not allowed '
                 'as a member of subscribed_services'
             )
 
     EventBus.declare_event(event_type, subscribed_services)
+
+
+def declare_cud_event(
+    cls,
+    resource_name: str,
+    model_class: typing.Type[Model],
+    subscribed_services: typing.List[str],
+):
+    """Configures a Django Model to send an event (using the resource_name
+    argument as event_type) whenever an instance of that model is created,
+    updated or deleted, attaching some extra metadata to the event payload
+
+    Arguments:
+        resource_name: str
+            A name or identifier of the Model ('users', 'articles')
+
+        model_class: django.db.models.Model
+            The class of the Model of which you want
+            emit events on changes
+
+        subscribed_services: List[str]
+            The names of the services that are subscribed
+            to changes of the provided model_class
+
+    NOTE:
+    Admisable values for the service names are:
+
+    - 'accounts'
+    - 'orders'
+    - 'payments'
+    - 'profiles'
+    - 'reports'
+    - 'selfdecode'
+
+    You can use the Service class (exported from the events_library
+    as well) for getting those options and avoid errors
+    """
+    for service_name in subscribed_services:
+        if not Service.is_valid(service_name):
+            raise ValueError(
+                f'{service_name} is not allowed '
+                'as a member of subscribed_services'
+            )
+
+    EventBus.declare_cud_event(resource_name, model_class, subscribed_services)

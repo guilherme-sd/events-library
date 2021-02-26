@@ -43,16 +43,11 @@ class EventBus():
     def subscribe_to_cud(
         cls,
         resource_name: str,
-        object_model_class: typing.Type[Model],
+        object_model_class: typing.Type[ObjectModel],
     ):
-        """Subscribes a ModelClass, identified by the given
+        """Subscribes a Model class, identified by the given
         resource_name argument, to CUD changes in the service
         which acts as source of true for the given Model"""
-        if not issubclass(object_model_class, ObjectModel):
-            raise ValueError(
-                f'{object_model_class} does not inherit from '
-                'the ObjectModel exported from the events_library'
-            )
         cls.map_event_to_object_model[resource_name] = object_model_class
 
     @classmethod
@@ -78,8 +73,8 @@ class EventBus():
 
     @classmethod
     def emit_cud_locally(cls, resource_name: str, payload: typing.Dict):
-        """Performs a CUD action in the Model class that was 
-        previously <subscribe_to_cud> using the same resource_name """
+        """Performs a CUD action in the Model class that was previously
+        subscribed to CUD changes using the same resource_name"""
         model_class = cls.map_event_to_model_class.get(resource_name, None)
         if not model_class:
             return

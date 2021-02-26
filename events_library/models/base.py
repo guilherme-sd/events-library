@@ -4,8 +4,8 @@ from uuid import uuid4
 
 
 class BaseModel(models.Model):
-    """Common primary key abstract model class, 
-    with created_at and updated_at fields included"""
+    """Common primary key abstract model class, with
+    created_at and updated_at fields included"""
     id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
 
     created_at = models.DateTimeField(auto_now_add=True)
