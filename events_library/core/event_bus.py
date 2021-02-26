@@ -65,6 +65,29 @@ class EventBus():
                 )
 
     @classmethod
+    def emit_cud_locally(cls, resource_name: str, payload: typing.Dict):
+        model_class = cls.map_event_to_model_class.get(resource_name, None)
+        if not model_class:
+            return
+
+        cud_operation = payload.pop('cud_operation')
+
+        if cud_operation == 'created':
+            model_class.objects.create(**payload)
+        else:
+            try:
+                model_instance = model_class.objects.get(id=payload['id'])
+            except model_class.DoesNotExist:
+                return
+
+            if cud_operation == "deleted":
+                model_instance.delete()
+            else:
+                for attr, value in payload.items():
+                    setattr(model_instance, attr, value)
+                model_instance.save()
+
+    @classmethod
     def emit_abroad(cls, event_type: str, payload: typing.Dict):
         """Sends the event to the services that
         are subscribed to the given event_type"""
