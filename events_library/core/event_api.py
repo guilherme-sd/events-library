@@ -11,7 +11,7 @@ LOG_EVENTS_ON_SUCCESS = settings.LOG_EVENTS_ON_SUCCESS
 
 
 class EventApi:
-    """Base class for serving different APIs."""
+    """Class for making HTTP request related to events"""
 
     def __init__(self, domain: str = None, max_retries: int = None) -> None:
         """Initialize requests session."""

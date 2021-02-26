@@ -26,6 +26,7 @@ class EventViewSet(ViewSet):
         event_type = event_serializer.validated_data['event_type']
         payload = event_serializer.validated_data['payload']
 
+        # Check if the incoming event is of kind CUD
         payload_serializer = CudPayloadSerializer(data=payload)
         if payload_serializer.is_valid():
             EventBus.emit_cud_locally(event_type, payload)
