@@ -1,5 +1,10 @@
-
+import time
 import typing
+
+from django.db.models import Model
+from django.db.models.signals import post_save, post_delete
+from enumfields.drf import EnumSupportSerializerMixin
+from rest_framework.serializers import ModelSerializer
 
 from events_library.core.event_api import EventApi
 from events_library.models import HandlerLog
@@ -17,6 +22,8 @@ class EventBus():
     # and the value is a list of service's names
     map_event_to_target_services = {}
 
+    map_event_to_model_class = {}
+
     @classmethod
     def subscribe(cls, event_type: str, event_handler: typing.Callable):
         """Adds the event_handler to the list of functions to be
@@ -27,6 +34,14 @@ class EventBus():
         # Add the new handler
         event_handlers.append(event_handler)
         cls.map_event_to_handlers[event_type] = event_handlers
+
+    @classmethod
+    def subscribe_to_cud(
+        cls,
+        resource_name: str,
+        object_model_class: typing.Type[Model],
+    ):
+        cls.map_event_to_object_model[resource_name] = object_model_class
 
     @classmethod
     def emit_locally(cls, event_type: str, payload: typing.Dict):
@@ -76,3 +91,39 @@ class EventBus():
                 current_targets.append(service_name)
 
         cls.map_event_to_target_services[event_type] = current_targets
+
+    @classmethod
+    def declare_cud_event(
+        cls,
+        resource_name: str,
+        model_class: typing.Type[Model],
+        target_services: typing.List[str],
+    ):
+        """Register a model to send post_save and post_delete events."""
+        class CustomSerializer(EnumSupportSerializerMixin, ModelSerializer):
+            class Meta:
+                model = model_class
+                fields = '__all__'
+
+        def handle_operation(instance, operation: str):
+            cud_payload = {
+                'id': instance.id,
+                'cud_operation': operation,
+                'data': CustomSerializer(instance).data,
+                'timestamp': time.time(),
+            }
+
+            api = EventApi()
+            for service_name in target_services:
+                api.send_event_request(
+                    service_name, resource_name, cud_payload,
+                )
+
+        def handle_deleted(instance, **kwargs):
+            handle_operation(instance, 'deleted')
+
+        def handle_edited(instance, created, **kwargs):
+            handle_operation(instance, 'created' if created else 'updated')
+
+        post_save.connect(handle_edited, sender=model_class, weak=False)
+        post_delete.connect(handle_deleted, sender=model_class, weak=False)
