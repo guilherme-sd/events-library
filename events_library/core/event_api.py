@@ -1,4 +1,4 @@
-"""Generic API class."""
+"""EventApi class, used for emitting events"""
 import typing
 
 from django.conf import settings
