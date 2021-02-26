@@ -7,7 +7,7 @@ from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework.serializers import ModelSerializer
 
 from events_library.core.event_api import EventApi
-from events_library.models import HandlerLog
+from events_library.models import HandlerLog, ObjectModel
 
 
 class EventBus():
@@ -22,6 +22,10 @@ class EventBus():
     # and the value is a list of service's names
     map_event_to_target_services = {}
 
+    # A mapping, where the key is the name of a
+    # resource ('users', 'articles', 'categories')
+    # and the value is a Django Model class, that
+    # must inherit from
     map_event_to_model_class = {}
 
     @classmethod
@@ -41,6 +45,14 @@ class EventBus():
         resource_name: str,
         object_model_class: typing.Type[Model],
     ):
+        """Subscribes a ModelClass, identified by the given
+        resource_name argument, to CUD changes in the service
+        which acts as source of true for the given Model"""
+        if not issubclass(object_model_class, ObjectModel):
+            raise ValueError(
+                f'{object_model_class} does not inherit from '
+                'the ObjectModel exported from the events_library'
+            )
         cls.map_event_to_object_model[resource_name] = object_model_class
 
     @classmethod
@@ -66,10 +78,13 @@ class EventBus():
 
     @classmethod
     def emit_cud_locally(cls, resource_name: str, payload: typing.Dict):
+        """Performs a CUD action in the Model class that was 
+        previously <subscribe_to_cud> using the same resource_name """
         model_class = cls.map_event_to_model_class.get(resource_name, None)
         if not model_class:
             return
 
+        # Remove field that's not part of the ObjectModel class
         cud_operation = payload.pop('cud_operation')
 
         if cud_operation == 'created':
@@ -83,6 +98,7 @@ class EventBus():
             if cud_operation == "deleted":
                 model_instance.delete()
             else:
+                # This is the way that DRF uses for updating models
                 for attr, value in payload.items():
                     setattr(model_instance, attr, value)
                 model_instance.save()
@@ -122,8 +138,10 @@ class EventBus():
         model_class: typing.Type[Model],
         target_services: typing.List[str],
     ):
-        """Register a model to send post_save and post_delete events."""
+        """Attachs to the model_class post_save and post_delete signals,
+        which emits the appropiate CUD event to the target_services argument"""
         class CustomSerializer(EnumSupportSerializerMixin, ModelSerializer):
+            """Serializer that extends ModelSerializer to support EnumFields"""
             class Meta:
                 model = model_class
                 fields = '__all__'
