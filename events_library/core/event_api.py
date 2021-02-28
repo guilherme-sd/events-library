@@ -73,15 +73,16 @@ class EventApi:
                 The payload data sent along the event
         """
 
-        path = f'service/{service_name}/event/'
         retry_number = 0
+        path = f'service/{service_name}/event/'
+        event = {'event_type': event_type, 'payload': payload}
 
         while (retry_number < self.max_retries):
             was_success = True
             error_message = ''
 
             try:
-                self.send_request(path, payload)
+                self.send_request(path, event)
 
             except RequestException as error:
                 retry_number += 1
