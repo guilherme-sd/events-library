@@ -48,7 +48,7 @@ class EventBus():
         """Subscribes a Model class, identified by the given
         resource_name argument, to CUD changes in the service
         which acts as source of true for the given Model"""
-        cls.map_event_to_object_model[resource_name] = object_model_class
+        cls.map_event_to_model_class[resource_name] = object_model_class
 
     @classmethod
     def emit_locally(cls, event_type: str, payload: typing.Dict):
