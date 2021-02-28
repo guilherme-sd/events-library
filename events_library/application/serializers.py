@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 
 class EventSerializer(serializers.Serializer):
@@ -12,10 +13,14 @@ class CudPayloadSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     cud_operation = serializers.CharField()
     data = serializers.JSONField(),
-    timestamp = serializers.DateTimeField()
+    timestamp = serializers.FloatField()
 
     class Meta:
         fields = '__all__'
 
     def validate_cud_operation(self, value):
-        return value in ['created', 'updated', 'deleted']
+        if value not in ['created', 'updated', 'deleted']:
+            raise ValidationError({
+                'cud_operation: 'f'{value} is not a valid value'
+            })
+        return value
