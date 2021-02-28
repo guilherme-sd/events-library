@@ -122,4 +122,4 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
-LOG_EVENTS_ON_SUCCESS = os.getenv("LOG_EVENTS_ON_SUCCESS", "True") == "True"
+LOG_EVENTS_ON_SUCCESS = os.getenv("LOG_EVENTS_ON_SUCCESS", "False") == "True"
