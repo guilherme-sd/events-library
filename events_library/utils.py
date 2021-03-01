@@ -81,7 +81,7 @@ class Service():
 
     @classmethod
     def is_valid(cls, service_name: str):
-        return service_name not in [
+        return service_name in [
             Service.ACCOUNTS,
             Service.ORDERS,
             Service.PAYMENTS,
