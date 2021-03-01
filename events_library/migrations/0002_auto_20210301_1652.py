@@ -15,11 +15,17 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='eventlog',
             name='payload',
-            field=django.contrib.postgres.fields.jsonb.JSONField(default=dict, encoder=django.core.serializers.json.DjangoJSONEncoder),
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                default=dict,
+                encoder=django.core.serializers.json.DjangoJSONEncoder,
+            ),
         ),
         migrations.AlterField(
             model_name='handlerlog',
             name='payload',
-            field=django.contrib.postgres.fields.jsonb.JSONField(default=dict, encoder=django.core.serializers.json.DjangoJSONEncoder),
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                default=dict,
+                encoder=django.core.serializers.json.DjangoJSONEncoder,
+            ),
         ),
     ]

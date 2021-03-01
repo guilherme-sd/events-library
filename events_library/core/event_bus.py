@@ -1,6 +1,7 @@
 import time
 import typing
 
+from django.conf import settings
 from django.db.models import Model
 from django.db.models.signals import post_save, post_delete
 from enumfields.drf import EnumSupportSerializerMixin
@@ -102,6 +103,9 @@ class EventBus():
     def emit_abroad(cls, event_type: str, payload: typing.Dict):
         """Sends the event to the services that
         are subscribed to the given event_type"""
+        if settings.DISABLE_EMIT_IN_EVENTS_LIBRARY:
+            return   # No op
+
         if event_type not in cls.map_event_to_target_services:
             return  # No op
 
