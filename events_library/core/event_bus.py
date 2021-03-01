@@ -6,7 +6,7 @@ from django.db.models.signals import post_save, post_delete
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework.serializers import ModelSerializer
 
-from ..core.event_api import EventApi
+from ..core import EventApi
 from ..models import HandlerLog, ObjectModel
 
 

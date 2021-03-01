@@ -3,7 +3,7 @@ import typing
 from django.db.models import Model
 from typing import Callable, Union
 
-from .core.event_bus import EventBus
+from .core import EventBus
 from .models import ObjectModel
 
 

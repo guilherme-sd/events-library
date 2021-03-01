@@ -6,11 +6,11 @@ from rest_framework.status import HTTP_204_NO_CONTENT
 
 from jwt_auth.authentication import ServiceTokenAuthentication
 
-from ..application.permissions import ServiceTokenPermission
-from ..application.serializers import (
+from .permissions import ServiceTokenPermission
+from .serializers import (
     EventSerializer, CudPayloadSerializer,
 )
-from ..core.event_bus import EventBus
+from ..core import EventBus
 
 
 class EventViewSet(ViewSet):
