@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.db.models import Model
 from django.http.request import HttpRequest
 
-from events_library.models import EventLog, HandlerLog
+from .models import EventLog, HandlerLog
 
 
 class InmutableAdminModel(admin.ModelAdmin):

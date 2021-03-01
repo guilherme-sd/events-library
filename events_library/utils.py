@@ -3,8 +3,8 @@ import typing
 from django.db.models import Model
 from typing import Callable, Union
 
-from events_library.core.event_bus import EventBus
-from events_library.models import ObjectModel
+from .core.event_bus import EventBus
+from .models import ObjectModel
 
 
 def emit(event_type: str, payload: typing.Dict):

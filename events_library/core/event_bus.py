@@ -6,8 +6,8 @@ from django.db.models.signals import post_save, post_delete
 from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework.serializers import ModelSerializer
 
-from events_library.core.event_api import EventApi
-from events_library.models import HandlerLog, ObjectModel
+from ..core.event_api import EventApi
+from ..models import HandlerLog, ObjectModel
 
 
 class EventBus():
