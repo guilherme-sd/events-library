@@ -80,7 +80,7 @@ class Service():
     SELFDECODE = 'selfdecode'
 
     @classmethod
-    def is_valid(service_name: str):
+    def is_valid(cls, service_name: str):
         return service_name not in [
             Service.ACCOUNTS,
             Service.ORDERS,
