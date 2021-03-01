@@ -7,30 +7,32 @@ This library aims to provide a common interface for sending and receiving events
 - the transport layer (HTTP, TPC, etc.)
 - the event bus or message broker (Kakfa, RabbitMQ, Redis, etc.)
 
-## Configuration
+## Installation
 
 The devops submodule should add this configuration to make everything work:
 
-1 - In the settings file, create the EVENTS_URL (string) and EVENTS_MAPPING (dict) variables:
+1 - Add rest_framework and events_library to your installed apps:
 
-    import json
+    INSTALLED_APPS = [
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        'rest_framework',
+        'events_library',
+    ]
 
-    EVENTS_URL = os.getenv('EVENTS_URL', 'event')
+2 - In the url file of your project, include this app urls:
 
-    DEFAULT_EVENTS_MAPPING = json.dumps({
-        'user-created': ['payments, 'orders'],
-    })
-    EVENTS_MAPPING = json.loads(os.getenv('EVENTS_MAPPING', DEFAULT_EVENTS_MAPPING))
+    from django.contrib import admin
+    from django.urls import path, include
 
-2 - In the url file, create a router and register the EventViewSet:
-
-    from django.conf import settings
-    from rest_framework.routers import DefaultRouter
-    from events_library.views import EventViewSet
-
-    EVENT_ROUTER = DefaultRouter()
-    EVENTS_URL = settings.EVENTS_URL
-    EVENT_ROUTER.register(EVENTS_URL, EventViewSet, basename=EVENTS_URL)
+    urlpatterns = [
+        path('admin/', admin.site.urls),
+        path('', include('events_library.urls'))
+    ]
 
 ## Usage
 

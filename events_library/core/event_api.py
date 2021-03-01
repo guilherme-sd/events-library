@@ -1,17 +1,17 @@
-"""Generic API class."""
+"""EventApi class, used for emitting events"""
 import typing
 
 from django.conf import settings
 from requests import Request, RequestException, Session
 from rest_framework.renderers import JSONRenderer
 
-from .models.event_log import EventLog
+from ..models import EventLog
 
 LOG_EVENTS_ON_SUCCESS = settings.LOG_EVENTS_ON_SUCCESS
 
 
-class BaseApi:
-    """Base class for serving different APIs."""
+class EventApi:
+    """Class for making HTTP request related to events"""
 
     def __init__(self, domain: str = None, max_retries: int = None) -> None:
         """Initialize requests session."""
@@ -73,15 +73,16 @@ class BaseApi:
                 The payload data sent along the event
         """
 
-        path = f'service/{service_name}/{settings.EVENTS_URL}/'
         retry_number = 0
+        path = f'service/{service_name}/event/'
+        event = {'event_type': event_type, 'payload': payload}
 
         while (retry_number < self.max_retries):
             was_success = True
             error_message = ''
 
             try:
-                self.send_request(path, payload)
+                self.send_request(path, event)
 
             except RequestException as error:
                 retry_number += 1
