@@ -1,4 +1,5 @@
 from django.contrib.postgres.fields import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 from .base import BaseModel
@@ -9,4 +10,4 @@ class HandlerLog(BaseModel):
     error_message = models.TextField(blank=False)
 
     event_type = models.CharField(max_length=60, blank=False)
-    payload = JSONField(default=dict)
+    payload = JSONField(default=dict, encoder=DjangoJSONEncoder)
