@@ -12,7 +12,7 @@ class CudPayloadSerializer(serializers.Serializer):
     """Serializer for validating payloads in CUD events"""
     id = serializers.UUIDField()
     cud_operation = serializers.CharField()
-    data = serializers.JSONField(),
+    data = serializers.JSONField()
     timestamp = serializers.FloatField()
 
     class Meta:
