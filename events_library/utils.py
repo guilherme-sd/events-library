@@ -84,6 +84,7 @@ class Service():
     def is_valid(cls, service_name: str):
         return service_name in [
             Service.ACCOUNTS,
+            Service.GENOME_FILES,
             Service.ORDERS,
             Service.PAYMENTS,
             Service.PROFILES,
