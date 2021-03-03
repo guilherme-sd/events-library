@@ -11,6 +11,14 @@ from ..core import EventApi
 from ..models import HandlerLog, ObjectModel
 
 
+class CudEvent():
+    """A class that encapsulates the available cud events
+    as members of the class, to be used instead of raw string"""
+    CREATED = 'created'
+    UPDATED = 'updated'
+    DELETED = 'deleted'
+
+
 class EventBus():
     """Main class of the lib, controlling the
     event's logic and subscription/emittion flow"""
@@ -83,7 +91,7 @@ class EventBus():
         # Remove field that's not part of the ObjectModel class
         cud_operation = payload.pop('cud_operation')
 
-        if cud_operation == 'created':
+        if cud_operation == CudEvent.CREATED:
             model_class.objects.create(**payload)
         else:
             try:
@@ -91,7 +99,7 @@ class EventBus():
             except model_class.DoesNotExist:
                 return
 
-            if cud_operation == "deleted":
+            if cud_operation == CudEvent.DELETED:
                 model_instance.delete()
             else:
                 # This is the way that DRF uses for updating models
@@ -160,10 +168,11 @@ class EventBus():
                 )
 
         def handle_deleted(instance, **kwargs):
-            handle_operation(instance, 'deleted')
+            handle_operation(instance, CudEvent.DELETED)
 
         def handle_edited(instance, created, **kwargs):
-            handle_operation(instance, 'created' if created else 'updated')
+            cud_operation = CudEvent.CREATED if created else CudEvent.UPDATED
+            handle_operation(instance, cud_operation)
 
         post_save.connect(handle_edited, sender=model_class, weak=False)
         post_delete.connect(handle_deleted, sender=model_class, weak=False)
