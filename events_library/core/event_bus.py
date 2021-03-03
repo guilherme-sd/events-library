@@ -1,6 +1,7 @@
 import time
 import typing
 
+from django.conf import settings
 from django.db.models import Model
 from django.db.models.signals import post_save, post_delete
 from enumfields.drf import EnumSupportSerializerMixin
@@ -8,6 +9,14 @@ from rest_framework.serializers import ModelSerializer
 
 from ..core import EventApi
 from ..models import HandlerLog, ObjectModel
+
+
+class CudEvent():
+    """A class that encapsulates the available cud events
+    as members of the class, to be used instead of raw string"""
+    CREATED = 'created'
+    UPDATED = 'updated'
+    DELETED = 'deleted'
 
 
 class EventBus():
@@ -82,7 +91,7 @@ class EventBus():
         # Remove field that's not part of the ObjectModel class
         cud_operation = payload.pop('cud_operation')
 
-        if cud_operation == 'created':
+        if cud_operation == CudEvent.CREATED:
             model_class.objects.create(**payload)
         else:
             try:
@@ -90,7 +99,7 @@ class EventBus():
             except model_class.DoesNotExist:
                 return
 
-            if cud_operation == "deleted":
+            if cud_operation == CudEvent.DELETED:
                 model_instance.delete()
             else:
                 # This is the way that DRF uses for updating models
@@ -102,6 +111,9 @@ class EventBus():
     def emit_abroad(cls, event_type: str, payload: typing.Dict):
         """Sends the event to the services that
         are subscribed to the given event_type"""
+        if settings.DISABLE_EMIT_IN_EVENTS_LIBRARY:
+            return   # No op
+
         if event_type not in cls.map_event_to_target_services:
             return  # No op
 
@@ -156,10 +168,11 @@ class EventBus():
                 )
 
         def handle_deleted(instance, **kwargs):
-            handle_operation(instance, 'deleted')
+            handle_operation(instance, CudEvent.DELETED)
 
         def handle_edited(instance, created, **kwargs):
-            handle_operation(instance, 'created' if created else 'updated')
+            cud_operation = CudEvent.CREATED if created else CudEvent.UPDATED
+            handle_operation(instance, cud_operation)
 
         post_save.connect(handle_edited, sender=model_class, weak=False)
         post_delete.connect(handle_deleted, sender=model_class, weak=False)

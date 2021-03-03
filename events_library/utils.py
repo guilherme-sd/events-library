@@ -73,6 +73,7 @@ class Service():
     """A class that encapsulates the available services
     as members of the class, to be used instead of raw string"""
     ACCOUNTS = 'accounts'
+    GENOME_FILES = 'genome-files'
     ORDERS = 'orders'
     PAYMENTS = 'payments'
     PROFILES = 'profiles'
@@ -133,7 +134,6 @@ def declare_event(
 
 
 def declare_cud_event(
-    cls,
     resource_name: str,
     model_class: typing.Type[Model],
     subscribed_services: typing.List[str],

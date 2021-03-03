@@ -16,8 +16,8 @@ class BaseModel(models.Model):
 
 
 class ObjectModel(models.Model):
-    """Model class to be used for replicating
-    models in other services and synchronization"""
+    """Model class to be used for synchronization
+    and replication of other's services models"""
     id = models.TextField(primary_key=True, null=False)
 
     data = JSONField()
