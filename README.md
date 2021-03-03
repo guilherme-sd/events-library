@@ -1,3 +1,3 @@
 # Events-Library
 
-Detailed docs in: https://github.com/SelfHacked/events-library-docs
+Detailed docs in: https://bitbucket.org/selfdecode/events-library/src/develop/
