@@ -97,6 +97,15 @@ class EventBus():
             try:
                 model_instance = model_class.objects.get(id=payload['id'])
             except model_class.DoesNotExist:
+                HandlerLog.objects.create(
+                    event_type=resource_name,
+                    payload=payload,
+                    handler_name=f'emit_cud_locally_{cud_operation}',
+                    error_message=(
+                        'No instance with the given id was found '
+                        f'during the cud_operation={cud_operation}',
+                    ),
+                )
                 return
 
             if cud_operation == CudEvent.DELETED:
