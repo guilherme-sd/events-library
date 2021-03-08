@@ -77,7 +77,7 @@ class Service():
     ORDERS = 'orders'
     PAYMENTS = 'payments'
     PROFILES = 'profiles'
-    REGIMENS = "regimens"
+    REGIMENS = 'regimens'
     REPORTS = 'reports'
     SELFDECODE = 'selfdecode'
 

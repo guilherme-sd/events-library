@@ -108,7 +108,7 @@ class EventBus():
                 )
                 return
 
-            if payload["timestamp"] <= model_instance.timestamp:
+            if payload['timestamp'] <= model_instance.timestamp:
                 # Do not perform update or delete that were emitted
                 # previously to the last handled operation
                 return
