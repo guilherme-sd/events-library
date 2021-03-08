@@ -108,6 +108,11 @@ class EventBus():
                 )
                 return
 
+            if payload["timestamp"] <= model_instance.timestamp:
+                # Do not perform update or delete that were emitted
+                # previously to the last handled operation
+                return
+
             if cud_operation == CudEvent.DELETED:
                 model_instance.delete()
             else:
