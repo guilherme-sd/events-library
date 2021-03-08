@@ -86,6 +86,9 @@ class EventBus():
         subscribed to CUD changes using the same resource_name"""
         model_class = cls.map_event_to_model_class.get(resource_name, None)
         if not model_class:
+            # In case the service is subscribed to
+            # the CUD event using an event handler
+            cls.emit_locally(resource_name, payload)
             return
 
         # Remove field that's not part of the ObjectModel class
