@@ -10,7 +10,13 @@ class EventSerializer(serializers.Serializer):
 
 
 class CudPayloadSerializer(serializers.Serializer):
-    """Serializer for validating payloads in CUD events"""
+    """Serializer for validating payloads in CUD events
+    The result of validating some data is a dict with:
+        id: str (uudi)
+        cud_operation: str('created' | 'updated' | 'deleted')
+        data: dict
+        timestamp: float
+    """
     id = serializers.UUIDField()
     cud_operation = serializers.CharField()
     data = serializers.JSONField()
