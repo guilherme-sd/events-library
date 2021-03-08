@@ -97,6 +97,15 @@ class EventBus():
             try:
                 model_instance = model_class.objects.get(id=payload['id'])
             except model_class.DoesNotExist:
+                HandlerLog.objects.create(
+                    event_type=resource_name,
+                    payload=payload,
+                    handler_name=f'emit_cud_locally_{cud_operation}',
+                    error_message=(
+                        'No instance with the given id was found '
+                        f'during the cud_operation={cud_operation}',
+                    ),
+                )
                 return
 
             if cud_operation == CudEvent.DELETED:
@@ -118,7 +127,6 @@ class EventBus():
             return  # No op
 
         api = EventApi()
-
         for target_service in cls.map_event_to_target_services[event_type]:
             api.send_event_request(target_service, event_type, payload)
 
@@ -161,11 +169,7 @@ class EventBus():
                 'timestamp': time.time(),
             }
 
-            api = EventApi()
-            for service_name in target_services:
-                api.send_event_request(
-                    service_name, resource_name, cud_payload,
-                )
+            cls.emit_abroad(resource_name, cud_payload)
 
         def handle_deleted(instance, **kwargs):
             handle_operation(instance, CudEvent.DELETED)
@@ -174,5 +178,6 @@ class EventBus():
             cud_operation = CudEvent.CREATED if created else CudEvent.UPDATED
             handle_operation(instance, cud_operation)
 
+        cls.map_event_to_target_services[resource_name] = target_services
         post_save.connect(handle_edited, sender=model_class, weak=False)
         post_delete.connect(handle_deleted, sender=model_class, weak=False)
