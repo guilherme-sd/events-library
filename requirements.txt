@@ -1,5 +1,9 @@
+uuid
 json
+time
 django
 typing
 requests
+django-enumfields
 djangorestframework
+git+git://github.com/SelfHacked/jwt-auth.git@master#egg=jwt-auth
