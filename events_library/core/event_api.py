@@ -41,9 +41,6 @@ class EventApi:
                 Wheter to raise an exception when an
                 HTTPError is found while doing the request
         """
-        if IS_BUILD_TIME:
-            return
-
         req = Request(
             method='POST',
             url=f'https://{self.domain}/{url}',
@@ -76,6 +73,8 @@ class EventApi:
             payload: dict
                 The payload data sent along the event
         """
+        if IS_BUILD_TIME:
+            return
 
         retry_number = 0
         path = f'service/{service_name}/event/'
