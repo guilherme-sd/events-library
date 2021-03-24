@@ -7,7 +7,8 @@ from rest_framework.renderers import JSONRenderer
 
 from ..models import EventLog
 
-LOG_EVENTS_ON_SUCCESS = settings.LOG_EVENTS_ON_SUCCESS
+IS_BUILD_TIME: bool = settings.IS_BUILD_TIME
+LOG_EVENTS_ON_SUCCESS: bool = settings.LOG_EVENTS_ON_SUCCESS
 
 
 class EventApi:
@@ -40,6 +41,9 @@ class EventApi:
                 Wheter to raise an exception when an
                 HTTPError is found while doing the request
         """
+        if IS_BUILD_TIME:
+            return
+
         req = Request(
             method='POST',
             url=f'https://{self.domain}/{url}',
