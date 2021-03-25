@@ -27,11 +27,16 @@ class InmutableAdminModel(admin.ModelAdmin):
 
 @admin.register(EventLog)
 class EventLogAdmin(InmutableAdminModel):
-    list_display = ['id', 'event_type', 'target_service', 'was_success']
+    list_display = [
+        'id', 'event_type', 'target_service',
+        'was_success', 'created_at',
+    ]
     ordering = ["-created_at"]
 
 
 @admin.register(HandlerLog)
 class HandlerLogAdmin(InmutableAdminModel):
-    list_display = ['id', 'event_type', 'handler_name']
+    list_display = [
+        'id', 'event_type', 'handler_name', 'created_at',
+    ]
     ordering = ["-created_at"]
