@@ -11,3 +11,6 @@ class HandlerLog(BaseModel):
 
     event_type = models.CharField(max_length=60, blank=False)
     payload = JSONField(default=dict, encoder=DjangoJSONEncoder)
+
+    def __str__(self):
+        return self.event_type
