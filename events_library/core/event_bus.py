@@ -77,7 +77,7 @@ class EventBus():
                     event_type=event_type,
                     payload=payload,
                     error_message=str(error),
-                    handler_name=str(event_handler),
+                    handler_name=event_handler.__name__,
                 )
 
     @classmethod
