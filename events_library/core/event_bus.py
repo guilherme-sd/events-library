@@ -84,7 +84,8 @@ class EventBus():
     def emit_cud_locally(cls, resource_name: str, payload: typing.Dict):
         """Performs a CUD action in the Model class that was previously
         subscribed to CUD changes using the same resource_name"""
-        model_class = cls.map_event_to_model_class.get(resource_name, None)
+        model_class: Model = cls.map_event_to_model_class.get(
+            resource_name, None)
         if not model_class:
             # In case the service is subscribed to
             # the CUD event using an event handler
@@ -92,37 +93,23 @@ class EventBus():
             return
 
         # Remove field that's not part of the ObjectModel class
+        object_id = payload['id']
         cud_operation = payload.pop('cud_operation')
 
-        if cud_operation == CudEvent.CREATED:
-            model_class.objects.create(**payload)
+        if cud_operation == CudEvent.DELETED:
+            model_class.objects.filter(pk=object_id).delete()
         else:
             try:
-                model_instance = model_class.objects.get(id=payload['id'])
+                model_instance: ObjectModel = model_class.objects.get(
+                    pk=object_id)
             except model_class.DoesNotExist:
-                HandlerLog.objects.create(
-                    event_type=resource_name,
-                    payload=payload,
-                    handler_name=f'emit_cud_locally_{cud_operation}',
-                    error_message=(
-                        'No instance with the given id was found '
-                        f'during the cud_operation={cud_operation}',
-                    ),
-                )
-                return
+                model_instance: ObjectModel = model_class(pk=object_id)
 
-            if payload['timestamp'] <= model_instance.timestamp:
-                # Do not perform update or delete that were emitted
-                # previously to the last handled operation
-                return
+            # This is the way that DRF uses for updating models
+            for attr, value in payload.items():
+                setattr(model_instance, attr, value)
 
-            if cud_operation == CudEvent.DELETED:
-                model_instance.delete()
-            else:
-                # This is the way that DRF uses for updating models
-                for attr, value in payload.items():
-                    setattr(model_instance, attr, value)
-                model_instance.save()
+            model_instance.save()
 
     @classmethod
     def emit_abroad(cls, event_type: str, payload: typing.Dict):
