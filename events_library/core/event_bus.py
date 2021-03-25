@@ -85,7 +85,8 @@ class EventBus():
         """Performs a CUD action in the Model class that was previously
         subscribed to CUD changes using the same resource_name"""
         model_class: Model = cls.map_event_to_model_class.get(
-            resource_name, None)
+            resource_name, None
+        )
         if not model_class:
             # In case the service is subscribed to
             # the CUD event using an event handler
@@ -101,7 +102,8 @@ class EventBus():
         else:
             try:
                 model_instance: ObjectModel = model_class.objects.get(
-                    pk=object_id)
+                    pk=object_id,
+                )
             except model_class.DoesNotExist:
                 model_instance: ObjectModel = model_class(pk=object_id)
 
