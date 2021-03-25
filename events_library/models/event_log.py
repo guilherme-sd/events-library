@@ -13,3 +13,7 @@ class EventLog(BaseModel):
     retry_number = models.IntegerField(default=0)
     was_success = models.BooleanField(default=False)
     error_message = models.TextField(blank=True)
+
+    def __str__(self) -> str:
+        status = 'Success' if self.was_success else 'Failure'
+        return f'{self.event_type} to {self.target_service} ({status})'
