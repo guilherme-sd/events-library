@@ -8,7 +8,7 @@ from enumfields.drf import EnumSupportSerializerMixin
 from rest_framework.serializers import ModelSerializer
 
 from ..core import EventApi
-from ..models import HandlerLog, ObjectModel
+from ..domain import HandlerLog, ObjectModel
 
 
 class CudEvent():

@@ -5,7 +5,7 @@ from typing import Callable, Union
 
 from .application import CudPayloadSerializer  # noqa: F401
 from .core import EventBus, CudEvent   # noqa: F401
-from .models import ObjectModel
+from .domain import ObjectModel
 
 
 def emit(event_type: str, payload: typing.Dict):
