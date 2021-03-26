@@ -3,7 +3,6 @@ import typing
 from django.contrib import admin
 from django.db.models import Model
 from django.http.request import HttpRequest
-from enumfields.admin import EnumFieldListFilter
 
 from .domain import EventLog, HandlerLog
 
@@ -31,10 +30,11 @@ class EventLogAdmin(InmutableAdminModel):
     list_filter = [
         "was_success",
         "event_type",
-        ("target_service", EnumFieldListFilter),
+        "target_service",
     ]
     list_display = [
-        'id', 'event_type', 'target_service',
+        'id', 'event_type',
+        'target_service',
         'was_success', 'created_at',
     ]
     ordering = ["-created_at"]
@@ -45,6 +45,7 @@ class HandlerLogAdmin(InmutableAdminModel):
     list_filter = ["event_type", "handler_name"]
 
     list_display = [
-        'id', 'event_type', 'handler_name', 'created_at',
+        'id', 'event_type',
+        'handler_name', 'created_at',
     ]
     ordering = ["-created_at"]
