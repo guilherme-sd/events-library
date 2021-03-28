@@ -23,6 +23,17 @@ class EventApi:
         self.domain = domain or settings.DOMAIN_NAME
         self.max_retries = max_retries or 1
 
+    @staticmethod
+    def _get_protocol(domain: str) -> str:
+        """For using http on development environments.
+        
+        Arguments:
+            domain: str
+                The domain being being used for the project
+        """
+        protocol = "http" if domain == "localhost" else "https"
+        return protocol
+
     def send_request(
         self,
         url: str,
@@ -42,7 +53,7 @@ class EventApi:
         """
         req = Request(
             method='POST',
-            url=f'https://{self.domain}/{url}',
+            url=f'{self._get_protocol(self.domain)}://{self.domain}/{url}',
             data=JSONRenderer().render(data),
             headers={
                 'Token': settings.JWT_AUTH['SERVICE_SECRET_TOKEN'],
